@@ -22145,14 +22145,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Number} left Left position of text
      * @param {Number} top Top position of text
      * @param {Number} lineIndex Index of a line in a text
+     * @param {Boolean} isLastLine Detects if the line is last in the text
      */
-    _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+    _renderTextLine: function(method, ctx, line, left, top, lineIndex, isLastLine) {
       // lift the line by quarter of fontSize
       top -= this.fontSize * this._fontSizeFraction;
 
       // short-circuit
       var lineWidth = this._getLineWidth(ctx, lineIndex);
-      if (this.textAlign !== 'justify' || this.width < lineWidth) {
+      if (this.textAlign !== 'justify' || this.width < lineWidth || isLastLine) {
         this._renderChars(method, ctx, line, left, top, lineIndex);
         return;
       }
@@ -22228,14 +22229,16 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         var heightOfLine = this._getHeightOfLine(ctx, i),
             maxHeight = heightOfLine / this.lineHeight,
             lineWidth = this._getLineWidth(ctx, i),
-            leftOffset = this._getLineLeftOffset(lineWidth);
+            leftOffset = this._getLineLeftOffset(lineWidth),
+            isLastLine = i === len - 1;
         this._renderTextLine(
           method,
           ctx,
           this._textLines[i],
           left + leftOffset,
           top + lineHeights + maxHeight,
-          i
+          i,
+          isLastLine
         );
         lineHeights += heightOfLine;
       }
@@ -23643,14 +23646,15 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
      * @param {Number} left
      * @param {Number} top
      * @param {Number} lineIndex
+     * @param {Boolean} isLastLine Detects if the line is last in the text
      */
-    _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+    _renderTextLine: function(method, ctx, line, left, top, lineIndex, isLastLine) {
       // to "cancel" this.fontSize subtraction in fabric.Text#_renderTextLine
       // the adding 0.03 is just to align text with itext by overlap test
       if (!this.isEmptyStyles()) {
         top += this.fontSize * (this._fontSizeFraction + 0.03);
       }
-      this.callSuper('_renderTextLine', method, ctx, line, left, top, lineIndex);
+      this.callSuper('_renderTextLine', method, ctx, line, left, top, lineIndex, isLastLine);
     },
 
     /**

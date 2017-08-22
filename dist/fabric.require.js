@@ -10400,10 +10400,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
             this[shortM].toLive && ctx.restore();
         },
-        _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+        _renderTextLine: function(method, ctx, line, left, top, lineIndex, isLastLine) {
             top -= this.fontSize * this._fontSizeFraction;
             var lineWidth = this._getLineWidth(ctx, lineIndex);
-            if (this.textAlign !== "justify" || this.width < lineWidth) {
+            if (this.textAlign !== "justify" || this.width < lineWidth || isLastLine) {
                 this._renderChars(method, ctx, line, left, top, lineIndex);
                 return;
             }
@@ -10439,8 +10439,8 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         _renderTextCommon: function(ctx, method) {
             var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
             for (var i = 0, len = this._textLines.length; i < len; i++) {
-                var heightOfLine = this._getHeightOfLine(ctx, i), maxHeight = heightOfLine / this.lineHeight, lineWidth = this._getLineWidth(ctx, i), leftOffset = this._getLineLeftOffset(lineWidth);
-                this._renderTextLine(method, ctx, this._textLines[i], left + leftOffset, top + lineHeights + maxHeight, i);
+                var heightOfLine = this._getHeightOfLine(ctx, i), maxHeight = heightOfLine / this.lineHeight, lineWidth = this._getLineWidth(ctx, i), leftOffset = this._getLineLeftOffset(lineWidth), isLastLine = i === len - 1;
+                this._renderTextLine(method, ctx, this._textLines[i], left + leftOffset, top + lineHeights + maxHeight, i, isLastLine);
                 lineHeights += heightOfLine;
             }
         },
@@ -11096,11 +11096,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
             }
         },
-        _renderTextLine: function(method, ctx, line, left, top, lineIndex) {
+        _renderTextLine: function(method, ctx, line, left, top, lineIndex, isLastLine) {
             if (!this.isEmptyStyles()) {
                 top += this.fontSize * (this._fontSizeFraction + .03);
             }
-            this.callSuper("_renderTextLine", method, ctx, line, left, top, lineIndex);
+            this.callSuper("_renderTextLine", method, ctx, line, left, top, lineIndex, isLastLine);
         },
         _renderTextDecoration: function(ctx) {
             if (this.isEmptyStyles()) {
