@@ -550,7 +550,7 @@
           dim = this._getTransformedDimensions(),
           p = fabric.util.transformPoint(dim, vpt, true);
 
-      return p.scalarAdd(2 * this.padding);
+      return p.scalarAdd(2 * this.padding, this.horizontalPadding, this.verticalPadding);
     },
   });
 })();

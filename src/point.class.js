@@ -57,10 +57,15 @@
     /**
      * Adds value to this point and returns a new one
      * @param {Number} scalar
+     * @param {Number} horizontalPadding
+     * @param {Number} verticalPadding
      * @return {fabric.Point} new Point with added value
      */
-    scalarAdd: function (scalar) {
-      return new Point(this.x + scalar, this.y + scalar);
+    scalarAdd: function (scalar, horizontalPadding, verticalPadding) {
+      if ( horizontalPadding !== 0 || verticalPadding !== 0 ) {
+        return new Point( this.x + horizontalPadding, this.y + verticalPadding );
+      }
+      return new Point( this.x + scalar, this.y + scalar );
     },
 
     /**

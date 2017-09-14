@@ -439,6 +439,20 @@
     padding:                  0,
 
     /**
+     * Vertical padding between object and its controlling borders (in pixels)
+     * @type Number
+     * @default
+     */
+    verticalPadding:          0,
+
+    /**
+     * Horizontal padding between object and its controlling borders (in pixels)
+     * @type Number
+     * @default
+     */
+    horizontalPadding:        0,
+
+    /**
      * Color of controlling borders of an object (when it's active)
      * @type String
      * @default
