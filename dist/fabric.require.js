@@ -10405,10 +10405,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
             }
             this[shortM].toLive && ctx.restore();
         },
-        _renderTextLine: function(method, ctx, line, left, top, lineIndex, isLastLine) {
+        _renderTextLine: function(method, ctx, line, left, top, lineIndex, withBreak) {
             top -= this.fontSize * this._fontSizeFraction;
             var lineWidth = this._getLineWidth(ctx, lineIndex);
-            if (this.textAlign !== "justify" || this.width < lineWidth || isLastLine) {
+            if (this.textAlign !== "justify" || this.width < lineWidth || withBreak) {
                 this._renderChars(method, ctx, line, left, top, lineIndex);
                 return;
             }
@@ -10443,9 +10443,10 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         _renderTextCommon: function(ctx, method) {
             var lineHeights = 0, left = this._getLeftOffset(), top = this._getTopOffset();
+            var lineIndexesWithBreak = this._getLineIndexesWithBreak();
             for (var i = 0, len = this._textLines.length; i < len; i++) {
-                var heightOfLine = this._getHeightOfLine(ctx, i), maxHeight = heightOfLine / this.lineHeight, lineWidth = this._getLineWidth(ctx, i), leftOffset = this._getLineLeftOffset(lineWidth), isLastLine = i === len - 1;
-                this._renderTextLine(method, ctx, this._textLines[i], left + leftOffset, top + lineHeights + maxHeight, i, isLastLine);
+                var heightOfLine = this._getHeightOfLine(ctx, i), maxHeight = heightOfLine / this.lineHeight, lineWidth = this._getLineWidth(ctx, i), leftOffset = this._getLineLeftOffset(lineWidth), withBreak = lineIndexesWithBreak.indexOf(i) > -1 || i === len - 1;
+                this._renderTextLine(method, ctx, this._textLines[i], left + leftOffset, top + lineHeights + maxHeight, i, withBreak);
                 lineHeights += heightOfLine;
             }
         },
@@ -10682,6 +10683,26 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
         },
         complexity: function() {
             return 1;
+        },
+        _getLineIndexesWithBreak: function() {
+            var splitLines = this.text.split(this._reNewline);
+            if (splitLines.length < 2) {
+                return [];
+            }
+            var i = 0;
+            var result = [];
+            for (var sl = 0; sl < splitLines.length; sl++) {
+                var currentSplitLineLength = splitLines[sl].length;
+                var compiledLine = "";
+                for (i; i < this._textLines.length; i++) {
+                    compiledLine += this._textLines[i];
+                    if (compiledLine.length > currentSplitLineLength) {
+                        result.push(i - 1);
+                        break;
+                    }
+                }
+            }
+            return result;
         }
     });
     fabric.Text.ATTRIBUTE_NAMES = fabric.SHARED_ATTRIBUTES.concat("x y dx dy font-family font-style font-weight font-size text-decoration text-anchor".split(" "));
@@ -11101,11 +11122,11 @@ fabric.Image.filters.BaseFilter.fromObject = function(object, callback) {
                 }
             }
         },
-        _renderTextLine: function(method, ctx, line, left, top, lineIndex, isLastLine) {
+        _renderTextLine: function(method, ctx, line, left, top, lineIndex, withBreak) {
             if (!this.isEmptyStyles()) {
                 top += this.fontSize * (this._fontSizeFraction + .03);
             }
-            this.callSuper("_renderTextLine", method, ctx, line, left, top, lineIndex, isLastLine);
+            this.callSuper("_renderTextLine", method, ctx, line, left, top, lineIndex, withBreak);
         },
         _renderTextDecoration: function(ctx) {
             if (this.isEmptyStyles()) {
